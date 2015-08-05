@@ -1,0 +1,94 @@
+#include <iostream>
+#include <vector>
+
+using namespace std;
+
+class Employee{
+private:
+  int id;
+  Employee *min, *max;
+  Employee *sup;
+  vector<Employee*> sub;
+  int pay;
+  int minV, maxV;
+
+public:
+  Employee(int id){
+    this->id = id;
+    min = max = this;
+    sub.push_back(this);
+  }
+
+  void updateSup(Employee* emp){
+    bool changed = false;
+    
+    if(emp == min){
+      searchMin();
+      changed = true;
+    }
+
+    if(emp == max){
+      maxV = max->getMax();
+      changed = true;
+    }
+
+    if(emp->getMax() > max->getMax()){
+      max = emp;
+      maxV = max->getMax();
+      changed = true;
+    }
+    
+    if(changed) update();
+  }
+  
+  void update(){
+    if(sup != NULL)
+      sup->updateSup(this);
+  }
+  
+  void setPay(int pay){
+    this->pay = minV = maxV = pay;
+    update();
+  }
+
+  void raisePay(int raise){
+    pay+=raise;
+    minV += raise;
+    maxV += raise;
+    for(int i=0; i<sub.size(); i++){
+      if(sub[i] != this)
+	sub[i]->raisePay(raise);
+    }
+  }
+
+  void addSub(Employee* emp){
+    sub.push_back(emp);
+  }
+
+  void searchMin(){
+    Employee* newMin = sub[0];
+    for(int i=1; i<sub.size(); i++){
+      if(sub[i]->getMin() < newMin->getMin())
+	newMin = sub[i];
+    }
+    min = newMin;
+    minV = min->getMin();
+  }
+
+  int getMin(){
+    return minV;
+  }
+
+  int getMax(){
+    return maxV;
+  }
+  
+  int getPay(){
+    return pay;
+  }
+};
+
+int main(){
+  
+  return 0;
+}
